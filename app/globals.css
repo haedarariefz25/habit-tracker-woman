@@ -959,6 +959,293 @@ button {
   margin-bottom: 12px;
 }
 
+.journal-layout {
+  margin-top: 4px;
+}
+
+.journal-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.journal-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--card-shadow);
+  padding: 20px;
+}
+
+.journal-card-wide {
+  grid-column: span 2;
+}
+
+.journal-head {
+  align-items: flex-start;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.journal-sub {
+  color: var(--text-light);
+  font-size: 0.9rem;
+  font-weight: 800;
+  line-height: 1.5;
+  margin-top: 6px;
+}
+
+.journal-date {
+  background: var(--surface-soft);
+  border-radius: 999px;
+  color: var(--text-mid);
+  font-size: 0.76rem;
+  font-weight: 900;
+  padding: 8px 12px;
+  white-space: nowrap;
+}
+
+.journal-metrics {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: 16px;
+}
+
+.journal-slider-block {
+  background: var(--surface-soft);
+  border-radius: 16px;
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+}
+
+.journal-slider-block span {
+  color: var(--text-mid);
+  font-size: 0.9rem;
+  font-weight: 900;
+}
+
+.journal-slider-block input[type="range"] {
+  accent-color: var(--pink-500);
+  width: 100%;
+}
+
+.journal-section-label {
+  color: var(--text-mid);
+  font-size: 0.84rem;
+  font-weight: 900;
+  margin-bottom: 10px;
+  margin-top: 12px;
+  text-transform: uppercase;
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip-button {
+  background: var(--surface-soft);
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  color: var(--text-mid);
+  font-size: 0.78rem;
+  font-weight: 900;
+  min-height: 34px;
+  padding: 8px 12px;
+  transition: all 0.18s ease;
+}
+
+.chip-button.active,
+.chip-button:hover {
+  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+  border-color: transparent;
+  color: white;
+}
+
+.prompt-card,
+.affirmation-card,
+.cycle-state-card,
+.insight-note,
+.entry-card {
+  background: var(--surface-soft);
+  border-radius: 16px;
+}
+
+.prompt-card {
+  margin-top: 14px;
+  padding: 16px;
+}
+
+.prompt-kicker {
+  color: var(--text-light);
+  font-size: 0.76rem;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.prompt-card p,
+.cycle-state-card p,
+.insight-note,
+.affirmation-card {
+  color: var(--text-dark);
+  font-size: 0.96rem;
+  font-weight: 800;
+  line-height: 1.6;
+}
+
+.journal-field-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 16px;
+}
+
+.journal-field {
+  display: grid;
+  gap: 8px;
+}
+
+.journal-field-full {
+  grid-column: 1 / -1;
+}
+
+.journal-field span {
+  color: var(--text-mid);
+  font-size: 0.84rem;
+  font-weight: 900;
+}
+
+.journal-field input,
+.journal-field textarea {
+  background: var(--input-bg);
+  border: 2px solid var(--pink-200);
+  border-radius: 14px;
+  color: var(--text-dark);
+  outline: 0;
+  padding: 12px 14px;
+  resize: vertical;
+}
+
+.journal-field input:focus,
+.journal-field textarea:focus {
+  border-color: var(--pink-400);
+}
+
+.journal-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.journal-helper {
+  color: var(--text-light);
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.cycle-state-card {
+  margin: 18px 0;
+  padding: 16px;
+}
+
+.cycle-phase-badge {
+  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+  border-radius: 999px;
+  color: white;
+  display: inline-flex;
+  font-size: 0.76rem;
+  font-weight: 900;
+  margin-bottom: 10px;
+  padding: 7px 12px;
+}
+
+.cycle-meta-line {
+  color: var(--text-mid);
+  font-size: 0.84rem;
+  font-weight: 900;
+  margin-bottom: 8px;
+}
+
+.affirmation-card {
+  min-height: 140px;
+  padding: 18px;
+}
+
+.insight-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 16px 0;
+}
+
+.insight-pill {
+  background: var(--surface-soft);
+  border-radius: 16px;
+  display: grid;
+  gap: 4px;
+  padding: 14px;
+}
+
+.insight-pill strong {
+  color: var(--text-dark);
+  font-size: 1.35rem;
+  font-weight: 900;
+}
+
+.insight-pill span {
+  color: var(--text-light);
+  font-size: 0.76rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.insight-note {
+  padding: 16px;
+}
+
+.entry-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.entry-card {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+}
+
+.entry-top,
+.entry-meta-row {
+  color: var(--text-light);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.78rem;
+  font-weight: 900;
+  gap: 8px 16px;
+  justify-content: space-between;
+}
+
+.entry-prompt {
+  color: var(--text-dark);
+  font-size: 0.9rem;
+  font-weight: 900;
+}
+
+.entry-highlight {
+  color: var(--text-mid);
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
 .chart-area {
   height: 290px;
   position: relative;
@@ -1168,5 +1455,20 @@ button {
 
   .graph-grid {
     grid-template-columns: 1fr;
+  }
+
+  .journal-grid,
+  .journal-metrics,
+  .journal-field-grid,
+  .insight-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .journal-card-wide {
+    grid-column: auto;
+  }
+
+  .journal-head {
+    flex-direction: column;
   }
 }
