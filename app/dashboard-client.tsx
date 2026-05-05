@@ -17,6 +17,10 @@ import {
   CalendarDays,
   CalendarRange,
   ChartNoAxesCombined,
+  BookOpen,
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
   Flame,
   LogOut,
   Palette,
@@ -45,7 +49,10 @@ type Frequency = "daily" | "weekly" | "monthly";
 type ThemeKey = "pink" | "lavender" | "minimal" | "dark";
 type JournalCategory = "self-love" | "anxiety" | "career" | "relationship" | "healing";
 type CyclePhase = "menstrual" | "follicular" | "ovulation" | "luteal";
-type TabKey = "daily" | "weekly" | "monthly" | "graphs" | "journal";
+type TabKey = "daily" | "weekly" | "monthly" | "graphs" | "journal" | "materials";
+
+type MaterialLevel = "basic" | "reflective" | "deep";
+type MaterialCategory = "self-love" | "relationship" | "feminine-energy";
 
 type Habit = {
   id: string;
@@ -91,6 +98,32 @@ type CycleSettings = {
   periodLength: number;
 };
 
+type LearningModule = {
+  slug: string;
+  title: string;
+  subtitle: string;
+  category: MaterialCategory;
+  level: MaterialLevel;
+  duration: string;
+  promise: string;
+  habitSuggestion: string;
+  journalPrompt: string;
+  sections: {
+    slug: string;
+    title: string;
+    summary: string;
+    body: string[];
+    reflection: string;
+    action: string;
+  }[];
+};
+
+type LearningProgress = {
+  moduleSlug: string;
+  completedSectionSlugs: string[];
+  lastSectionSlug: string | null;
+};
+
 type DbHabit = {
   id: string;
   name: string;
@@ -126,6 +159,12 @@ type DbCycleSettings = {
   last_period_start: string | null;
   cycle_length: number;
   period_length: number;
+};
+
+type DbLearningProgress = {
+  module_slug: string;
+  completed_section_slugs: string[] | null;
+  last_section_slug: string | null;
 };
 
 type PhaseMeta = {
@@ -263,6 +302,332 @@ const AFFIRMATIONS: Record<CyclePhase, string[]> = {
     "You are doing better than you think.",
   ],
 };
+const MATERIAL_LEVEL_LABELS: Record<MaterialLevel, string> = {
+  basic: "Basic",
+  reflective: "Reflective",
+  deep: "Deep Work",
+};
+const MATERIAL_CATEGORY_LABELS: Record<MaterialCategory, string> = {
+  "self-love": "Self-love",
+  relationship: "Relationship",
+  "feminine-energy": "Feminine Energy",
+};
+const LEARNING_MODULES: LearningModule[] = [
+  {
+    slug: "perempuan-yang-utuh",
+    title: "Perempuan yang Utuh: Ketika Lembut Bertemu Kegelapan",
+    subtitle: "Memahami energi feminin sebagai kelembutan, kedalaman, batasan, dan transformasi.",
+    category: "feminine-energy",
+    level: "deep",
+    duration: "18 menit",
+    promise: "Membantumu melihat bahwa menjadi utuh bukan berarti selalu terang, tapi berani mengenali cahaya dan bayanganmu sendiri.",
+    habitSuggestion: "5 menit self-reflection tanpa menghakimi emosi yang muncul.",
+    journalPrompt: "Bagian mana dari diriku yang selama ini terasa terlalu gelap untuk diterima?",
+    sections: [
+      {
+        slug: "cahaya-dan-kegelapan",
+        title: "Energi Feminin: Antara Cahaya dan Kegelapan",
+        summary: "Energi feminin bukan cuma lembut dan hangat. Ia juga punya sisi gelap yang dalam dan jujur.",
+        body: [
+          "Kita sering diajarkan memilih satu sisi: baik atau buruk, kuat atau lembut. Padahal manusia bergerak dalam spektrum yang jauh lebih kaya. Energi feminin punya sisi terang yang penuh kasih, kreativitas, dan penerimaan, tapi juga punya sisi gelap yang misterius dan transformatif.",
+          "Kalau kita hanya menerima bagian yang nyaman, kita akan terus hidup setengah. Modul ini mengajakmu melihat keseluruhan diri: kelembutan dan keberanian, kehangatan dan ketegasan, cinta dan kehancuran atas hal-hal yang tidak lagi sehat.",
+        ],
+        reflection: "Bagian feminin dalam dirimu selama ini lebih sering kamu hidupi sebagai kelembutan, atau justru kamu sembunyikan karena takut dianggap terlalu intens?",
+        action: "Tuliskan satu kualitas lembut dan satu kualitas tegas dalam dirimu yang sama-sama pantas dihargai.",
+      },
+      {
+        slug: "child-queen-goddess",
+        title: "Child, Queen, dan Goddess di Dalam Diri",
+        summary: "Ada sisi spontan, sisi tegas, dan sisi paling matang di dalam dirimu. Ketiganya perlu dikenali.",
+        body: [
+          "Ada saat ketika kita bereaksi seperti Child: impulsif, emosional, butuh dilihat, dan mudah terluka. Ada saat ketika Queen mengambil alih: menjaga batas, memimpin, dan melindungi harga diri. Di antara keduanya ada Goddess, sisi paling utuh yang lembut tanpa lemah dan kuat tanpa menjadi keras.",
+          "Menjadi utuh bukan memilih salah satu persona. Yang lebih penting adalah mengenali kapan masing-masing muncul, lalu belajar kembali ke pusat diri yang paling sadar.",
+        ],
+        reflection: "Saat sedang terpicu, persona mana yang paling sering mengambil alih dirimu?",
+        action: "Amati satu situasi hari ini dan beri nama: Child, Queen, atau Goddess yang paling dominan.",
+      },
+      {
+        slug: "maskulin-dan-feminin",
+        title: "Maskulin dan Feminin: Bukan Musuh, Tapi Pasangan",
+        summary: "Maskulin memberi arah dan struktur, feminin memberi rasa dan aliran. Keduanya perlu bekerja sama.",
+        body: [
+          "Energi maskulin bergerak dalam aksi, tujuan, keputusan, dan struktur. Energi feminin bergerak dalam rasa, proses, kreativitas, dan penerimaan. Dunia modern sering memaksa kita hidup terus dalam mode maskulin: sibuk, cepat, produktif, dan selalu mengejar.",
+          "Tanpa sisi feminin, hidup jadi kering dan tegang. Tanpa sisi maskulin, kita kehilangan arah. Harmoni muncul saat kita punya ruang untuk keduanya: disiplin yang tidak mematikan rasa, dan kelembutan yang tidak membuat kita tercerai-berai.",
+        ],
+        reflection: "Di fase hidupmu sekarang, kamu merasa terlalu terdorong untuk produktif atau terlalu kehilangan struktur?",
+        action: "Pilih satu aktivitas hari ini yang kamu lakukan dengan tempo lebih sadar, bukan terburu-buru.",
+      },
+      {
+        slug: "dark-feminine",
+        title: "Masuk ke Kedalaman: Dark Feminine Energy",
+        summary: "Dark feminine bukan jahat. Ia adalah sisi terdalam yang menyimpan kejujuran, luka, dan transformasi.",
+        body: [
+          "Dark feminine adalah ruang kosong sebelum sesuatu tercipta, dan keheningan setelah sesuatu berakhir. Ia hadir dalam intuisi yang tak bisa dijelaskan, dalam rasa yang muncul sebelum logika mengejarnya, dan dalam dorongan untuk berubah walau belum siap.",
+          "Di sanalah tersimpan luka lama, keinginan terdalam, dan kebenaran yang sering kita sembunyikan bahkan dari diri sendiri. Justru karena itu banyak orang takut menghadapinya.",
+        ],
+        reflection: "Apa kebenaran tentang dirimu yang selama ini paling sering kamu tunda untuk akui?",
+        action: "Tulis satu kalimat jujur yang biasanya kamu sensor ketika berbicara pada diri sendiri.",
+      },
+      {
+        slug: "takut-pada-bayangan",
+        title: "Kenapa Kita Takut pada Sisi Gelap Kita",
+        summary: "Sejak kecil kita diajarkan bahwa gelap itu buruk, sehingga emosi yang tak nyaman sering kita tolak.",
+        body: [
+          "Budaya sering mengaitkan kegelapan dengan bahaya, dosa, atau sesuatu yang harus disingkirkan. Akibatnya kita belajar menyembunyikan amarah, kesedihan, iri hati, dan rasa takut, seolah emosi itu membuat kita kurang baik.",
+          "Padahal yang ditekan tidak benar-benar hilang. Ia tinggal di bawah sadar dan diam-diam mengatur cara kita bereaksi. Dark feminine membuka pintu menuju bagian-bagian itu bukan untuk merusak, melainkan untuk membuat kita utuh.",
+        ],
+        reflection: "Emosi apa yang paling sering kamu tolak karena takut terlihat buruk?",
+        action: "Saat emosi itu muncul lagi, ganti respon otomatis dengan kalimat: ‘aku tidak suka rasanya, tapi aku mau mendengarnya dulu’.",
+      },
+      {
+        slug: "kekuatan-dalam-kegelapan",
+        title: "Kekuatan di Dalam Kegelapan",
+        summary: "Marah bisa menjadi batasan. Takut bisa menjadi kompas. Sedih bisa menjadi pintu empati.",
+        body: [
+          "Begitu kita berani duduk bersama sisi gelap, makna emosi berubah. Kemarahan tidak selalu berarti destruktif; ia bisa menandai batas yang selama ini dilanggar. Kesedihan tidak selalu melemahkan; ia bisa membuka empati. Rasa takut bisa menunjukkan ke mana hidup sebenarnya memanggil kita.",
+          "Dark feminine sering disalahartikan sebagai sikap manipulatif atau dingin. Padahal bentuk terdewasanya justru kejujuran emosional dan keberanian untuk berubah.",
+        ],
+        reflection: "Kalau amarahmu dilihat sebagai penjaga batas, batas apa yang sedang ia coba lindungi?",
+        action: "Tuliskan satu batas sehat yang ingin kamu mulai jaga minggu ini.",
+      },
+      {
+        slug: "keseimbangan",
+        title: "Menemukan Keseimbangan: Cahaya dan Bayangan",
+        summary: "Utuh berarti bisa lembut tanpa kehilangan daya, dan bisa kuat tanpa kehilangan empati.",
+        body: [
+          "Light feminine memberi kehangatan, koneksi, dan cinta. Dark feminine memberi kedalaman, kekuatan, dan transformasi. Keduanya tidak perlu dipertentangkan.",
+          "Seperti siang dan malam, keduanya adalah bagian dari satu sistem yang sama. Semakin kita menerima keduanya, semakin sedikit energi yang terbuang untuk berpura-pura.",
+        ],
+        reflection: "Bagian dirimu mana yang mulai terasa lebih mudah diterima ketika kamu berhenti menuntut diri untuk selalu manis atau selalu kuat?",
+        action: "Pilih satu situasi besok di mana kamu ingin hadir lembut tapi tetap tegas.",
+      },
+      {
+        slug: "perjalanan-ke-dalam",
+        title: "Perjalanan ke Dalam Diri",
+        summary: "Perubahan tidak selalu dramatis. Kadang dimulai dari keberanian kecil untuk duduk bersama emosi.",
+        body: [
+          "Masuk ke dalam diri bukan proses sekali baca lalu selesai. Kadang ia dimulai dari duduk diam, menulis tanpa sensor, memberi ruang pada kreativitas, atau sekadar mengakui bahwa kamu sedang tidak baik-baik saja.",
+          "Semakin kamu mengenali ruang batinmu, semakin jelas bahwa banyak hal yang selama ini ditakuti ternyata menyimpan sumber kekuatanmu sendiri.",
+        ],
+        reflection: "Ritual kecil apa yang paling realistis untuk membantumu lebih dekat dengan dirimu minggu ini?",
+        action: "Jadwalkan 10 menit tenang untuk dirimu sendiri dalam 24 jam ke depan.",
+      },
+      {
+        slug: "menjadi-utuh",
+        title: "Penutup: Menjadi Utuh",
+        summary: "Tujuan akhirnya bukan menjadi sempurna, melainkan menjadi jujur, hidup, dan utuh.",
+        body: [
+          "Hidup bukan tentang selalu positif, selalu kuat, atau selalu benar. Menjadi utuh berarti menerima cahaya dan kegelapanmu sebagai bagian dari manusia yang sama.",
+          "Saat kamu berhenti mengejar citra ‘baik’ di mata orang lain, kamu mulai bertemu dengan versi dirimu yang paling nyata. Dan dari situlah kekuatan yang tenang mulai tumbuh.",
+        ],
+        reflection: "Kalimat seperti apa yang ingin kamu bawa pulang dari modul ini sebagai pengingat dirimu sendiri?",
+        action: "Simpan satu kalimat pribadi sebagai mantra untuk kembali ke pusat dirimu ketika hidup terasa bising.",
+      },
+    ],
+  },
+  {
+    slug: "love-your-self",
+    title: "Love Your Self",
+    subtitle: "Perjalanan pulang ke diri sendiri lewat citra diri, penerimaan, dan kasih yang lebih jujur.",
+    category: "self-love",
+    level: "reflective",
+    duration: "16 menit",
+    promise: "Membantumu membangun hubungan yang lebih hangat dengan diri sendiri, bukan hubungan yang terus penuh tuntutan.",
+    habitSuggestion: "Satu kalimat self-talk yang baik setiap pagi sebelum mulai aktivitas.",
+    journalPrompt: "Bagaimana aku ingin memperlakukan diriku sendiri minggu ini agar terasa lebih aman dan penuh hormat?",
+    sections: [
+      {
+        slug: "pulang-ke-diri",
+        title: "Kembali Pulang ke Diri",
+        summary: "Di tengah pencapaian dan validasi luar, hubungan dengan diri sendiri sering jadi yang paling terlupakan.",
+        body: [
+          "Kita kerap sibuk mengejar pengakuan dan hasil sampai lupa berhenti dan menoleh ke dalam. Padahal hubungan dengan diri sendiri adalah fondasi dari hampir semua hal: keputusan, relasi, arah hidup, dan rasa cukup.",
+          "Modul ini mengajakmu melihat self-love bukan sebagai slogan, melainkan perjalanan pulang ke diri yang selama ini mungkin terlalu lama kamu abaikan.",
+        ],
+        reflection: "Di area hidup mana kamu paling sering mencari jawaban ke luar, padahal sebenarnya kamu butuh kembali mendengarkan dirimu sendiri?",
+        action: "Ambil jeda lima menit hari ini hanya untuk bertanya: ‘sebenarnya aku lagi butuh apa?’",
+      },
+      {
+        slug: "citra-diri",
+        title: "Citra Diri Membentuk Cara Kita Hidup",
+        summary: "Cara kamu memandang diri sendiri akan memengaruhi cara kamu berpikir, merasa, dan bertindak.",
+        body: [
+          "Citra diri adalah lensa yang menentukan bagaimana kamu menafsirkan pengalaman. Saat lensa itu dipenuhi keyakinan bahwa kamu berharga dan mampu, hidup terasa lebih luas. Saat lensa itu dibentuk oleh luka dan keraguan, dunia terasa sempit dan melelahkan.",
+          "Karena itu self-love bukan dimulai dari afirmasi kosong, tapi dari kesadaran akan fondasi keyakinan tentang siapa dirimu.",
+        ],
+        reflection: "Kalimat tentang dirimu sendiri yang paling sering berulang di kepala akhir-akhir ini apa?",
+        action: "Tangkap satu pikiran negatif yang paling sering muncul, lalu tulis versi yang lebih jujur dan lebih lembut.",
+      },
+      {
+        slug: "tekanan-dunia-modern",
+        title: "Tekanan Dunia Modern dan Hilangnya Keaslian Diri",
+        summary: "Tuntutan untuk sempurna sering membuat seseorang hidup dari ekspektasi, bukan dari keaslian diri.",
+        body: [
+          "Tekanan sosial, perbandingan tanpa akhir, dan standar yang tidak realistis membuat banyak orang hidup dalam bayang-bayang ekspektasi. Kita bisa terlihat baik-baik saja dari luar tapi pelan-pelan kehilangan pusat diri.",
+          "Saat itu terjadi, self-love menjadi tindakan radikal: memilih keaslian daripada pencitraan, dan memilih kedekatan dengan diri daripada perlombaan tanpa ujung.",
+        ],
+        reflection: "Standar luar mana yang paling sering membuatmu merasa tertinggal atau kurang?",
+        action: "Pilih satu standar yang ingin kamu berhenti pakai untuk menilai dirimu minggu ini.",
+      },
+      {
+        slug: "mengenal-diri",
+        title: "Mengenal Diri dengan Jujur",
+        summary: "Mengenal diri bukan cuma tahu suka dan tidak suka, tapi juga berani melihat luka dan ketakutan.",
+        body: [
+          "Kejujuran pada diri sering tidak nyaman, karena ia membuka hal-hal yang selama ini ingin kita sembunyikan. Tapi justru dari keberanian itulah pijakan batin terbentuk.",
+          "Semakin kamu mengenal dirimu secara utuh, semakin kecil kekuasaan penilaian orang lain atas hidupmu.",
+        ],
+        reflection: "Sisi dirimu mana yang paling jarang kamu akui karena takut terlihat lemah?",
+        action: "Tuliskan tiga hal yang benar tentang dirimu: satu yang kamu banggakan, satu yang masih rapuh, dan satu yang ingin kamu rawat.",
+      },
+      {
+        slug: "menerima-diri",
+        title: "Menerima Diri Bukan Berarti Menyerah",
+        summary: "Penerimaan diri adalah keberanian untuk berhenti memusuhi diri, bukan alasan untuk berhenti bertumbuh.",
+        body: [
+          "Menerima diri berarti mengakui bahwa kita tidak sempurna, punya kekurangan, dan tidak bisa mengontrol semuanya. Itu bukan pasrah, justru itu bentuk keberanian paling jujur.",
+          "Saat penerimaan hadir, kita tidak lagi memperbaiki diri dari kebencian, tapi dari kasih yang sehat.",
+        ],
+        reflection: "Bagian dirimu mana yang paling sulit diterima, dan apa yang membuatnya terasa begitu berat?",
+        action: "Ucapkan satu kalimat penerimaan yang spesifik pada dirimu hari ini.",
+      },
+      {
+        slug: "berdamai-dengan-masa-lalu",
+        title: "Berdamai dengan Diri dan Masa Lalu",
+        summary: "Berdamai bukan melupakan, melainkan mengubah cara memandang luka dan kesalahan.",
+        body: [
+          "Luka lama dan kesalahan masa lalu tidak perlu menjadi penjara identitas. Saat dipandang dengan lebih sadar, semuanya bisa berubah menjadi sumber kebijaksanaan.",
+          "Sering kali konflik dengan orang lain berakar dari konflik yang belum selesai di dalam diri. Maka berdamai dengan diri adalah fondasi hubungan yang lebih sehat.",
+        ],
+        reflection: "Apakah ada pengalaman lama yang masih diam-diam kamu gunakan untuk menghukum dirimu sampai sekarang?",
+        action: "Tulis satu hal dari masa lalu yang ingin kamu pandang ulang dengan lebih penuh kasih.",
+      },
+      {
+        slug: "ekspresi-diri-sehat",
+        title: "Ekspresi Diri yang Sehat",
+        summary: "Emosi yang tidak diakui tidak hilang; ia hanya menunggu keluar dengan cara yang kurang sehat.",
+        body: [
+          "Banyak dari kita dibesarkan untuk menahan emosi agar terlihat baik atau kuat. Akibatnya, kita kehilangan bahasa untuk menjelaskan apa yang sebenarnya kita rasakan.",
+          "Ekspresi diri yang sehat bukan meluapkan semuanya tanpa batas, tetapi mengenali, memahami, lalu menyampaikan perasaan dengan tepat. Dari situlah hubungan yang lebih jujur terbentuk.",
+        ],
+        reflection: "Emosi mana yang paling sulit kamu ekspresikan dengan jujur pada orang lain?",
+        action: "Latih satu kalimat sederhana untuk menyampaikan perasaanmu tanpa menyalahkan siapa pun.",
+      },
+      {
+        slug: "praktik-self-love",
+        title: "Praktik Mencintai Diri dalam Hal-Hal Sederhana",
+        summary: "Self-love hidup dalam kebiasaan kecil: istirahat, self-talk, batasan, dan relaksasi.",
+        body: [
+          "Mencintai diri sering terdengar besar, padahal praktiknya justru sederhana: berbicara dengan kata-kata yang baik, memberi tubuh waktu beristirahat, memahami batas kemampuan, dan tidak memaksa diri memenuhi standar yang tak realistis.",
+          "Relaksasi, jeda, dan perhatian kecil pada tubuh adalah bentuk konkret dari kasih pada diri. Ia menenangkan pikiran dan membantu kita kembali terhubung dengan pusat diri.",
+        ],
+        reflection: "Bentuk kasih sederhana apa yang paling lama tidak kamu beri pada dirimu sendiri?",
+        action: "Pilih satu tindakan self-care kecil yang realistis kamu lakukan hari ini.",
+      },
+      {
+        slug: "mencintai-diri-dan-relasi",
+        title: "Saat Self-Love Mengubah Relasi",
+        summary: "Saat seseorang merasa diterima di dalam dirinya, ia tidak lagi meminta dunia mengisi seluruh kekosongan itu.",
+        body: [
+          "Mencintai diri bukan cuma berdampak pada diri sendiri. Ketika kamu tidak lagi hidup dari kelaparan validasi, hubungan menjadi lebih tulus, lebih tenang, dan tidak terlalu menuntut.",
+          "Perjalanan ini memang panjang, tapi di ujungnya ada kedamaian yang sering kita cari jauh-jauh: rasa pulang ke diri sendiri.",
+        ],
+        reflection: "Kalau hubunganmu dengan diri sendiri lebih hangat, apa yang akan berubah dalam caramu mencintai orang lain?",
+        action: "Tutup modul ini dengan satu komitmen kecil untuk memperlakukan dirimu lebih hormat minggu ini.",
+      },
+    ],
+  },
+  {
+    slug: "why-women-cry",
+    title: "Why Women Cry",
+    subtitle: "Memahami cara perempuan berkomunikasi, merasa terhubung, dan dipahami dalam relasi.",
+    category: "relationship",
+    level: "reflective",
+    duration: "14 menit",
+    promise: "Membantu user membaca perbedaan komunikasi dengan lebih lembut, supaya relasi terasa lebih nyambung dan tidak cepat defensif.",
+    habitSuggestion: "Sebelum memberi solusi, dengarkan penuh selama 3 menit tanpa menyela.",
+    journalPrompt: "Dalam relasiku, kapan aku paling ingin dipahami, bukan diperbaiki?",
+    sections: [
+      {
+        slug: "misteri-perbedaan",
+        title: "Mengapa Perbedaan Ini Sering Terasa Membingungkan",
+        summary: "Perbedaan pria dan wanita dalam berkomunikasi sering terasa misterius padahal punya akar yang bisa dipahami.",
+        body: [
+          "Banyak konflik relasi sebenarnya bukan karena salah satu pihak buruk, melainkan karena kedua orang memproses dunia dengan cara yang berbeda. What feels obvious to one person can feel confusing to the other.",
+          "Saat perbedaan itu dibaca sebagai keanehan, hubungan cepat lelah. Saat dibaca sebagai pola yang masuk akal, hubungan punya ruang untuk bernapas.",
+        ],
+        reflection: "Dalam relasi dekatmu, perbedaan komunikasi apa yang paling sering bikin kamu merasa ‘kok susah banget dimengerti’?",
+        action: "Coba amati satu pola komunikasi yang berulang tanpa langsung menilainya benar atau salah.",
+      },
+      {
+        slug: "bicara-untuk-terhubung",
+        title: "Wanita Berbicara untuk Terhubung",
+        summary: "Bagi banyak perempuan, percakapan bukan cuma penyampai informasi, tapi jembatan emosional.",
+        body: [
+          "Secara sosial dan historis, perempuan banyak berkembang dalam ruang yang bertumpu pada percakapan, kerja sama, dan koneksi. Karena itu berbicara sering terasa seperti cara alami untuk merasa dekat, aman, dan tidak sendirian.",
+          "Itulah mengapa cerita panjang, detail, dan berlapis sering punya fungsi emosional yang penting, bukan sekadar ‘terlalu banyak kata’.",
+        ],
+        reflection: "Saat kamu bercerita panjang, apa yang sebenarnya paling kamu harapkan: solusi, ditemani, atau dipahami?",
+        action: "Lain kali kamu bercerita, coba nyatakan dengan jelas kebutuhanmu di awal percakapan.",
+      },
+      {
+        slug: "solusi-vs-didengar",
+        title: "Masalah Bukan Selalu Minta Solusi",
+        summary: "Sering kali perempuan ingin didengar dulu, bukan langsung diberi jalan keluar.",
+        body: [
+          "Banyak orang dengan pola pikir problem-solving akan otomatis mencari solusi saat mendengar keluhan. Niatnya baik, tapi dampaknya bisa membuat lawan bicara merasa emosinya dilewati.",
+          "Kadang yang paling menyembuhkan bukan jawaban, melainkan kehadiran. Didengar penuh tanpa diburu untuk ‘baik-baik saja’ adalah bentuk kedekatan yang sangat kuat.",
+        ],
+        reflection: "Dalam relasimu, kapan kamu merasa paling tidak didengar meskipun lawan bicaramu sedang berusaha membantu?",
+        action: "Latih kalimat ini: ‘aku cuma mau didengar dulu ya, belum butuh solusi’.",
+      },
+      {
+        slug: "emosi-dan-bahasa",
+        title: "Bahasa Emosi dan Kecenderungan Melebihkan",
+        summary: "Kadang intensitas kata bukan soal fakta, tapi cara menyampaikan kedalaman emosi.",
+        body: [
+          "Kalimat seperti ‘aku sudah bilang ribuan kali’ biasanya bukan soal angka, melainkan rasa frustrasi yang sedang memuncak. Saat lawan bicara menanggapi hanya secara literal, inti emosinya jadi hilang.",
+          "Belajar membaca bahasa emosi berarti mendengar apa yang dirasakan di balik kata, bukan cuma apa yang diucapkan secara harfiah.",
+        ],
+        reflection: "Apa contoh kalimat emosional yang sering kamu ucapkan dan sering disalahpahami secara literal?",
+        action: "Saat emosi tinggi, coba lanjutkan kalimatmu dengan penjelasan rasa yang lebih spesifik.",
+      },
+      {
+        slug: "komunikasi-tidak-langsung",
+        title: "Ketika Maksud Disampaikan Tidak Langsung",
+        summary: "Banyak perempuan menyampaikan maksud lewat konteks dan isyarat demi menjaga harmoni.",
+        body: [
+          "Cara bicara yang berputar atau penuh konteks sering lahir bukan karena manipulatif, tapi karena ada keinginan menjaga hubungan tetap aman. Namun bagi orang yang lebih literal, ini bisa terasa membingungkan.",
+          "Komunikasi yang sehat sering perlu dua arah: keberanian untuk lebih jelas, dan kesabaran untuk menangkap makna di balik konteks.",
+        ],
+        reflection: "Apakah kamu lebih sering menahan inti pesanmu demi menghindari konflik?",
+        action: "Latih satu kalimat yang lebih langsung tapi tetap hangat untuk menyampaikan kebutuhanmu.",
+      },
+      {
+        slug: "detail-dan-relasi",
+        title: "Kenapa Detail Terasa Penting",
+        summary: "Bagi banyak perempuan, detail adalah cara memahami hubungan dan menjaga koneksi tetap hidup.",
+        body: [
+          "Siapa, kapan, bagaimana, dan kenapa bukan sekadar tambahan. Detail membantu banyak perempuan membaca dinamika, mengenali makna sosial, dan merawat relasi.",
+          "Sebaliknya, sebagian orang lebih fokus pada inti besar dan merasa detail tidak terlalu perlu. Perbedaan ini kecil, tapi bisa memicu salah paham kalau tidak dipahami sebagai perbedaan gaya, bukan kurang peduli.",
+        ],
+        reflection: "Dalam percakapan penting, apakah kamu merasa detailmu sering dianggap berlebihan atau justru sangat penting untuk merasa dipahami?",
+        action: "Sebelum percakapan penting, tentukan detail mana yang benar-benar inti untuk kamu sampaikan.",
+      },
+      {
+        slug: "harmoni-dalam-perbedaan",
+        title: "Hubungan Jadi Lebih Harmonis Saat Perbedaan Dipahami",
+        summary: "Tidak ada yang salah dari dua gaya berbeda. Yang dibutuhkan adalah terjemahan, bukan perlawanan.",
+        body: [
+          "Saat satu pihak sadar bahwa bicara bisa jadi cara terhubung, dan pihak lain sadar bahwa kejelasan bisa jadi cara peduli, hubungan menjadi lebih tenang. Bukan karena semua jadi sama, tapi karena keduanya mulai menerjemahkan dunia satu sama lain.",
+          "Di situlah hubungan terasa hidup: bukan dalam keseragaman, tapi dalam pemahaman yang terus diusahakan.",
+        ],
+        reflection: "Apa satu perubahan kecil dalam caramu berkomunikasi yang bisa membuat relasimu terasa lebih dipahami minggu ini?",
+        action: "Pilih satu relasi penting dan praktikkan mendengar tanpa defensif pada percakapan berikutnya.",
+      },
+    ],
+  },
+];
 const PHASE_HINTS: Record<CyclePhase, string> = {
   menstrual: "Saatnya rest and reflect. Prioritaskan tubuhmu, kurangi tekanan, dan pilih ritme yang lebih lembut.",
   follicular: "Energi biasanya mulai naik. Ini momen bagus untuk mencoba hal baru dan membangun momentum.",
@@ -439,6 +804,36 @@ function buildDefaultJournalForm(dateValue: string, category: JournalCategory = 
   };
 }
 
+function mapDbLearningProgress(row: DbLearningProgress): LearningProgress {
+  return {
+    moduleSlug: row.module_slug,
+    completedSectionSlugs: row.completed_section_slugs ?? [],
+    lastSectionSlug: row.last_section_slug ?? null,
+  };
+}
+
+function getModuleBySlug(moduleSlug: string) {
+  return LEARNING_MODULES.find((module) => module.slug === moduleSlug) ?? LEARNING_MODULES[0];
+}
+
+function getSectionBySlug(module: LearningModule, sectionSlug: string | null) {
+  if (!sectionSlug) return module.sections[0];
+  return module.sections.find((section) => section.slug === sectionSlug) ?? module.sections[0];
+}
+
+function getModuleProgress(module: LearningModule, progress: LearningProgress | null) {
+  const completed = progress?.completedSectionSlugs.filter((slug) =>
+    module.sections.some((section) => section.slug === slug),
+  ).length ?? 0;
+  const percent = Math.round((completed / module.sections.length) * 100);
+
+  return {
+    completed,
+    percent,
+    isCompleted: completed === module.sections.length,
+  };
+}
+
 function computeCycleMeta(settings: CycleSettings, todayDate: string): PhaseMeta | null {
   if (!settings.lastPeriodStart) return null;
 
@@ -572,9 +967,14 @@ export default function DashboardClient({
   const [isReady, setIsReady] = useState(false);
   const [isLoadingHabits, setIsLoadingHabits] = useState(true);
   const [isLoadingJournal, setIsLoadingJournal] = useState(true);
+  const [isLoadingMaterials, setIsLoadingMaterials] = useState(true);
   const [isSavingJournal, setIsSavingJournal] = useState(false);
   const [isSavingCycle, setIsSavingCycle] = useState(false);
+  const [isSavingMaterialProgress, setIsSavingMaterialProgress] = useState(false);
   const [cloudError, setCloudError] = useState<string | null>(null);
+  const [materialProgress, setMaterialProgress] = useState<Record<string, LearningProgress>>({});
+  const [selectedModuleSlug, setSelectedModuleSlug] = useState(LEARNING_MODULES[0].slug);
+  const [selectedSectionSlug, setSelectedSectionSlug] = useState<string | null>(LEARNING_MODULES[0].sections[0]?.slug ?? null);
 
   const todayEntry = useMemo(
     () => journalEntries.find((entry) => entry.entryDate === todayDate) ?? null,
@@ -583,6 +983,11 @@ export default function DashboardClient({
   const cycleMeta = useMemo(() => computeCycleMeta(cycleSettings, todayDate), [cycleSettings, todayDate]);
   const affirmation = useMemo(() => getAffirmation(cycleMeta?.phase ?? null, journalForm.moodScore), [cycleMeta, journalForm.moodScore]);
   const journalInsight = useMemo(() => getJournalInsight(journalEntries, habits, cycleMeta), [cycleMeta, habits, journalEntries]);
+  const activeModule = useMemo(() => getModuleBySlug(selectedModuleSlug), [selectedModuleSlug]);
+  const activeModuleProgress = useMemo(
+    () => materialProgress[activeModule.slug] ?? null,
+    [activeModule.slug, materialProgress],
+  );
 
   useEffect(() => {
     setIsReady(true);
@@ -700,6 +1105,44 @@ export default function DashboardClient({
         setIsLoadingHabits(false);
       }
     });
+
+    return () => {
+      ignore = true;
+    };
+  }, [supabase, userId]);
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function loadMaterialProgress() {
+      setIsLoadingMaterials(true);
+
+      const { data, error } = await supabase
+        .from("learning_progress")
+        .select("module_slug,completed_section_slugs,last_section_slug")
+        .eq("user_id", userId);
+
+      if (error) {
+        if (!ignore) {
+          setCloudError(error.message);
+          setIsLoadingMaterials(false);
+        }
+        return;
+      }
+
+      if (ignore) return;
+
+      const mapped = ((data ?? []) as DbLearningProgress[]).map(mapDbLearningProgress);
+      const nextProgress = mapped.reduce<Record<string, LearningProgress>>((accumulator, item) => {
+        accumulator[item.moduleSlug] = item;
+        return accumulator;
+      }, {});
+
+      setMaterialProgress(nextProgress);
+      setIsLoadingMaterials(false);
+    }
+
+    loadMaterialProgress();
 
     return () => {
       ignore = true;
@@ -830,6 +1273,14 @@ export default function DashboardClient({
       return { ...fallback, promptCategory: current.promptCategory, promptText: getPromptForDay(current.promptCategory, todayDate) };
     });
   }, [isLoadingJournal, isReady, todayDate, todayEntry]);
+
+  useEffect(() => {
+    const module = getModuleBySlug(selectedModuleSlug);
+    const preferredSection = getSectionBySlug(module, materialProgress[module.slug]?.lastSectionSlug ?? selectedSectionSlug);
+    if (preferredSection.slug !== selectedSectionSlug) {
+      setSelectedSectionSlug(preferredSection.slug);
+    }
+  }, [materialProgress, selectedModuleSlug, selectedSectionSlug]);
 
   async function changeTheme(nextTheme: ThemeKey) {
     const previous = theme;
@@ -1026,6 +1477,77 @@ export default function DashboardClient({
     });
   }
 
+  async function persistMaterialProgress(moduleSlug: string, nextProgress: LearningProgress) {
+    setIsSavingMaterialProgress(true);
+
+    const { error } = await supabase.from("learning_progress").upsert(
+      {
+        user_id: userId,
+        module_slug: moduleSlug,
+        completed_section_slugs: nextProgress.completedSectionSlugs,
+        last_section_slug: nextProgress.lastSectionSlug,
+        last_opened_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id,module_slug" },
+    );
+
+    setIsSavingMaterialProgress(false);
+
+    if (error) {
+      setCloudError(error.message);
+    }
+  }
+
+  function openMaterialModule(moduleSlug: string) {
+    const module = getModuleBySlug(moduleSlug);
+    const preferredSection = getSectionBySlug(module, materialProgress[module.slug]?.lastSectionSlug ?? null);
+    setSelectedModuleSlug(module.slug);
+    setSelectedSectionSlug(preferredSection.slug);
+  }
+
+  async function jumpToMaterialSection(moduleSlug: string, sectionSlug: string) {
+    const currentProgress = materialProgress[moduleSlug] ?? {
+      moduleSlug,
+      completedSectionSlugs: [],
+      lastSectionSlug: null,
+    };
+    const nextProgress = {
+      ...currentProgress,
+      lastSectionSlug: sectionSlug,
+    };
+
+    setSelectedModuleSlug(moduleSlug);
+    setSelectedSectionSlug(sectionSlug);
+    setMaterialProgress((current) => ({ ...current, [moduleSlug]: nextProgress }));
+    await persistMaterialProgress(moduleSlug, nextProgress);
+  }
+
+  async function markMaterialSectionComplete(moduleSlug: string, sectionSlug: string) {
+    const currentProgress = materialProgress[moduleSlug] ?? {
+      moduleSlug,
+      completedSectionSlugs: [],
+      lastSectionSlug: null,
+    };
+    const completedSectionSlugs = currentProgress.completedSectionSlugs.includes(sectionSlug)
+      ? currentProgress.completedSectionSlugs
+      : [...currentProgress.completedSectionSlugs, sectionSlug];
+    const nextProgress = {
+      ...currentProgress,
+      completedSectionSlugs,
+      lastSectionSlug: sectionSlug,
+    };
+
+    setMaterialProgress((current) => ({ ...current, [moduleSlug]: nextProgress }));
+    await persistMaterialProgress(moduleSlug, nextProgress);
+
+    const module = getModuleBySlug(moduleSlug);
+    const sectionIndex = module.sections.findIndex((section) => section.slug === sectionSlug);
+    const nextSection = module.sections[sectionIndex + 1];
+    if (nextSection) {
+      setSelectedSectionSlug(nextSection.slug);
+    }
+  }
+
   const motivation = MOTIVATIONS[today.getDay() % MOTIVATIONS.length];
   const todayKey = dateKey(today);
   const doneToday = habits.filter((habit) => habit.checks[todayKey]).length;
@@ -1085,6 +1607,7 @@ export default function DashboardClient({
 
         {isLoadingHabits ? <div className="cloud-loading">Memuat data habit dari Supabase...</div> : null}
         {isLoadingJournal ? <div className="cloud-loading">Menyiapkan journal dan insight personalmu...</div> : null}
+        {isLoadingMaterials ? <div className="cloud-loading">Menata modul belajar dan progress materimu...</div> : null}
 
         <section className="motivate-bar">
           <span className="motivate-emoji">{motivation.e}</span>
@@ -1113,6 +1636,9 @@ export default function DashboardClient({
           </TabButton>
           <TabButton active={activeTab === "journal"} onClick={() => setActiveTab("journal")} icon={<Sparkles />}>
             Journal
+          </TabButton>
+          <TabButton active={activeTab === "materials"} onClick={() => setActiveTab("materials")} icon={<BookOpen />}>
+            Materi
           </TabButton>
         </nav>
 
@@ -1162,6 +1688,20 @@ export default function DashboardClient({
             setJournalForm={setJournalForm}
             todayDate={todayDate}
             updateJournalCategory={updateJournalCategory}
+          />
+        )}
+        {activeTab === "materials" && (
+          <MaterialsPanel
+            activeModule={activeModule}
+            activeProgress={activeModuleProgress}
+            isSavingMaterialProgress={isSavingMaterialProgress}
+            jumpToMaterialSection={jumpToMaterialSection}
+            markMaterialSectionComplete={markMaterialSectionComplete}
+            materialProgress={materialProgress}
+            modules={LEARNING_MODULES}
+            onOpenJournal={() => setActiveTab("journal")}
+            openMaterialModule={openMaterialModule}
+            selectedSectionSlug={selectedSectionSlug}
           />
         )}
       </div>
@@ -2016,6 +2556,219 @@ function JournalPanel({
             )}
           </div>
         </article>
+      </div>
+    </section>
+  );
+}
+
+function MaterialsPanel({
+  activeModule,
+  activeProgress,
+  isSavingMaterialProgress,
+  jumpToMaterialSection,
+  markMaterialSectionComplete,
+  materialProgress,
+  modules,
+  onOpenJournal,
+  openMaterialModule,
+  selectedSectionSlug,
+}: {
+  activeModule: LearningModule;
+  activeProgress: LearningProgress | null;
+  isSavingMaterialProgress: boolean;
+  jumpToMaterialSection: (moduleSlug: string, sectionSlug: string) => Promise<void>;
+  markMaterialSectionComplete: (moduleSlug: string, sectionSlug: string) => Promise<void>;
+  materialProgress: Record<string, LearningProgress>;
+  modules: LearningModule[];
+  onOpenJournal: () => void;
+  openMaterialModule: (moduleSlug: string) => void;
+  selectedSectionSlug: string | null;
+}) {
+  const currentSection = getSectionBySlug(activeModule, selectedSectionSlug);
+  const currentSectionIndex = activeModule.sections.findIndex((section) => section.slug === currentSection.slug);
+  const moduleProgressMeta = getModuleProgress(activeModule, activeProgress);
+  const previousSection = currentSectionIndex > 0 ? activeModule.sections[currentSectionIndex - 1] : null;
+  const nextSection = currentSectionIndex < activeModule.sections.length - 1 ? activeModule.sections[currentSectionIndex + 1] : null;
+
+  return (
+    <section className="materials-layout">
+      <div className="materials-hero">
+        <div>
+          <div className="section-title">Mini Course untuk Bertumbuh Pelan-Pelan</div>
+          <p className="journal-sub">
+            Bukan artikel panjang yang bikin berat. Setiap materi dipecah jadi langkah kecil, refleksi, dan aksi yang bisa langsung kamu hubungkan ke journal.
+          </p>
+        </div>
+        <div className="materials-hero-pill">
+          <BookOpen size={16} /> {modules.length} modul belajar
+        </div>
+      </div>
+
+      <div className="materials-shell">
+        <aside className="materials-sidebar">
+          {modules.map((module) => {
+            const progress = getModuleProgress(module, materialProgress[module.slug] ?? null);
+            const isActive = module.slug === activeModule.slug;
+            return (
+              <button
+                className={`module-card ${isActive ? "active" : ""}`}
+                key={module.slug}
+                onClick={() => openMaterialModule(module.slug)}
+                type="button"
+              >
+                <div className="module-card-top">
+                  <span className="module-badge">{MATERIAL_CATEGORY_LABELS[module.category]}</span>
+                  <span className="module-level">{MATERIAL_LEVEL_LABELS[module.level]}</span>
+                </div>
+                <strong>{module.title}</strong>
+                <p>{module.subtitle}</p>
+                <div className="module-meta-line">
+                  <span>{module.duration}</span>
+                  <span>
+                    {progress.completed}/{module.sections.length} bab
+                  </span>
+                </div>
+                <div className="module-progress-bar">
+                  <span style={{ width: `${progress.percent}%` }} />
+                </div>
+                <div className="module-status-line">
+                  <span>{progress.isCompleted ? "Selesai" : progress.completed > 0 ? "Sedang dipelajari" : "Belum mulai"}</span>
+                  <span>{progress.percent}%</span>
+                </div>
+              </button>
+            );
+          })}
+        </aside>
+
+        <div className="materials-content">
+          <article className="material-detail-card">
+            <div className="material-detail-head">
+              <div>
+                <div className="material-kicker">
+                  {MATERIAL_CATEGORY_LABELS[activeModule.category]} · {MATERIAL_LEVEL_LABELS[activeModule.level]}
+                </div>
+                <h3>{activeModule.title}</h3>
+                <p>{activeModule.promise}</p>
+              </div>
+              <div className="material-progress-box">
+                <strong>{moduleProgressMeta.percent}%</strong>
+                <span>progress modul</span>
+              </div>
+            </div>
+
+            <div className="material-course-meta">
+              <div>
+                <span>Durasi</span>
+                <strong>{activeModule.duration}</strong>
+              </div>
+              <div>
+                <span>Bab</span>
+                <strong>{activeModule.sections.length} bagian</strong>
+              </div>
+              <div>
+                <span>Practice habit</span>
+                <strong>{activeModule.habitSuggestion}</strong>
+              </div>
+            </div>
+
+            <div className="material-section-list">
+              {activeModule.sections.map((section, index) => {
+                const isDone = activeProgress?.completedSectionSlugs.includes(section.slug) ?? false;
+                const isCurrent = currentSection.slug === section.slug;
+                return (
+                  <button
+                    className={`material-section-item ${isCurrent ? "active" : ""}`}
+                    key={section.slug}
+                    onClick={() => jumpToMaterialSection(activeModule.slug, section.slug)}
+                    type="button"
+                  >
+                    <div className="material-section-index">{index + 1}</div>
+                    <div className="material-section-copy">
+                      <strong>{section.title}</strong>
+                      <p>{section.summary}</p>
+                    </div>
+                    {isDone ? <CheckCircle2 size={18} /> : <ChevronRight size={18} />}
+                  </button>
+                );
+              })}
+            </div>
+          </article>
+
+          <article className="material-reader-card">
+            <div className="reader-topline">
+              <span>
+                Bab {currentSectionIndex + 1} dari {activeModule.sections.length}
+              </span>
+              <span>{moduleProgressMeta.completed} selesai</span>
+            </div>
+            <h3>{currentSection.title}</h3>
+            <p className="reader-summary">{currentSection.summary}</p>
+
+            <div className="reader-body">
+              {currentSection.body.map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+              ))}
+            </div>
+
+            <div className="reader-insight-grid">
+              <div className="reader-callout">
+                <div className="prompt-kicker">Refleksi</div>
+                <p>{currentSection.reflection}</p>
+              </div>
+              <div className="reader-callout">
+                <div className="prompt-kicker">Aksi kecil hari ini</div>
+                <p>{currentSection.action}</p>
+              </div>
+            </div>
+
+            <div className="reader-bridge-card">
+              <div>
+                <div className="prompt-kicker">Hubungkan ke Journal</div>
+                <p>{activeModule.journalPrompt}</p>
+              </div>
+              <button className="btn-add" onClick={onOpenJournal} type="button">
+                Buka Journal
+              </button>
+            </div>
+
+            <div className="reader-actions">
+              <button
+                className="ghost-nav-btn"
+                disabled={!previousSection}
+                onClick={() => {
+                  if (previousSection) {
+                    void jumpToMaterialSection(activeModule.slug, previousSection.slug);
+                  }
+                }}
+                type="button"
+              >
+                <ChevronLeft size={16} />
+                Sebelumnya
+              </button>
+              <button
+                className="btn-add"
+                disabled={isSavingMaterialProgress}
+                onClick={() => markMaterialSectionComplete(activeModule.slug, currentSection.slug)}
+                type="button"
+              >
+                {isSavingMaterialProgress ? "Menyimpan..." : nextSection ? "Tandai selesai & lanjut" : "Tandai modul selesai"}
+              </button>
+              <button
+                className="ghost-nav-btn"
+                disabled={!nextSection}
+                onClick={() => {
+                  if (nextSection) {
+                    void jumpToMaterialSection(activeModule.slug, nextSection.slug);
+                  }
+                }}
+                type="button"
+              >
+                Lanjut
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          </article>
+        </div>
       </div>
     </section>
   );

@@ -1378,6 +1378,303 @@ button {
   overflow-wrap: anywhere;
 }
 
+.materials-layout {
+  display: grid;
+  gap: 18px;
+}
+
+.materials-hero,
+.material-detail-card,
+.material-reader-card,
+.reader-callout {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--card-shadow);
+}
+
+.materials-hero {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  padding: 18px 20px;
+}
+
+.materials-hero-pill {
+  align-items: center;
+  background: color-mix(in srgb, var(--pink-200) 65%, var(--surface));
+  border-radius: 999px;
+  color: var(--text-mid);
+  display: inline-flex;
+  flex-shrink: 0;
+  font-size: 0.84rem;
+  font-weight: 900;
+  gap: 8px;
+  padding: 10px 14px;
+}
+
+.materials-shell {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+}
+
+.materials-sidebar,
+.materials-content,
+.material-section-list,
+.reader-body {
+  display: grid;
+  gap: 14px;
+}
+
+.module-card,
+.material-section-item,
+.ghost-nav-btn {
+  background: var(--surface);
+  border: 2px solid var(--border-soft);
+  color: var(--text-dark);
+}
+
+.module-card {
+  border-radius: 18px;
+  box-shadow: var(--card-shadow);
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  text-align: left;
+  transition: transform 0.18s ease, border-color 0.18s ease;
+}
+
+.module-card:hover,
+.material-section-item:hover,
+.ghost-nav-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.module-card.active,
+.material-section-item.active {
+  border-color: var(--pink-400);
+}
+
+.module-card-top,
+.module-meta-line,
+.module-status-line,
+.material-detail-head,
+.material-course-meta,
+.reader-topline,
+.reader-actions {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.module-badge,
+.module-level {
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 900;
+  padding: 5px 9px;
+}
+
+.module-badge {
+  background: var(--pink-200);
+  color: var(--pink-600);
+}
+
+.module-level {
+  background: color-mix(in srgb, var(--mint) 72%, var(--surface));
+  color: var(--text-mid);
+}
+
+.module-card strong,
+.material-section-copy strong,
+.material-reader-card h3,
+.material-detail-card h3 {
+  color: var(--text-dark);
+}
+
+.module-card strong {
+  font-size: 1rem;
+  line-height: 1.25;
+}
+
+.module-card p,
+.material-section-copy p,
+.material-detail-card p,
+.reader-summary,
+.reader-body p,
+.reader-callout p,
+.reader-bridge-card p {
+  color: var(--text-mid);
+  line-height: 1.7;
+}
+
+.module-card p {
+  font-size: 0.86rem;
+}
+
+.module-meta-line,
+.module-status-line,
+.reader-topline {
+  color: var(--text-light);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.module-progress-bar {
+  background: var(--pink-100);
+  border-radius: 999px;
+  height: 10px;
+  overflow: hidden;
+}
+
+.module-progress-bar span {
+  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+  border-radius: 999px;
+  display: block;
+  height: 100%;
+}
+
+.material-detail-card,
+.material-reader-card {
+  padding: 20px;
+}
+
+.material-kicker {
+  color: var(--text-light);
+  font-size: 0.74rem;
+  font-weight: 900;
+  letter-spacing: 0.4px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.material-detail-card h3,
+.material-reader-card h3 {
+  font-size: 1.3rem;
+  font-weight: 900;
+}
+
+.material-progress-box {
+  align-items: center;
+  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+  border-radius: 18px;
+  color: white;
+  display: grid;
+  flex-shrink: 0;
+  min-width: 110px;
+  padding: 12px 14px;
+  text-align: center;
+}
+
+.material-progress-box strong {
+  color: white;
+  font-size: 1.6rem;
+}
+
+.material-progress-box span,
+.material-course-meta span {
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
+.material-course-meta {
+  border-bottom: 1px solid var(--pink-100);
+  border-top: 1px solid var(--pink-100);
+  margin: 18px 0;
+  padding: 14px 0;
+}
+
+.material-course-meta div {
+  display: grid;
+  gap: 4px;
+}
+
+.material-course-meta strong {
+  color: var(--text-dark);
+  font-size: 0.9rem;
+}
+
+.material-section-item {
+  align-items: center;
+  border-radius: 16px;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 34px minmax(0, 1fr) 20px;
+  padding: 14px 16px;
+  text-align: left;
+  transition: transform 0.18s ease, border-color 0.18s ease;
+}
+
+.material-section-index {
+  align-items: center;
+  background: var(--pink-100);
+  border-radius: 10px;
+  color: var(--text-mid);
+  display: flex;
+  font-size: 0.82rem;
+  font-weight: 900;
+  height: 34px;
+  justify-content: center;
+  width: 34px;
+}
+
+.material-reader-card {
+  display: grid;
+  gap: 16px;
+}
+
+.reader-summary {
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.reader-body p {
+  font-size: 0.96rem;
+}
+
+.reader-insight-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.reader-callout {
+  padding: 16px;
+}
+
+.reader-bridge-card {
+  align-items: center;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--pink-200) 62%, var(--surface)),
+    color-mix(in srgb, var(--lavender) 40%, var(--surface))
+  );
+  border-radius: 18px;
+  display: flex;
+  gap: 14px;
+  justify-content: space-between;
+  padding: 16px;
+}
+
+.ghost-nav-btn {
+  align-items: center;
+  border-radius: 12px;
+  display: inline-flex;
+  font-size: 0.92rem;
+  font-weight: 900;
+  gap: 7px;
+  min-height: 42px;
+  padding: 10px 16px;
+}
+
+.ghost-nav-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+  transform: none;
+}
+
 @media (max-width: 720px) {
   .header-title {
     font-size: 1.85rem;
@@ -1457,6 +1754,7 @@ button {
     grid-template-columns: 1fr;
   }
 
+  .materials-shell,
   .journal-grid,
   .journal-metrics,
   .journal-field-grid,
@@ -1464,11 +1762,30 @@ button {
     grid-template-columns: 1fr;
   }
 
+  .materials-hero,
+  .material-detail-head,
+  .material-course-meta,
+  .reader-actions,
+  .reader-bridge-card,
   .journal-card-wide {
     grid-column: auto;
   }
 
+  .materials-hero,
+  .material-detail-head,
+  .material-course-meta,
+  .reader-actions,
+  .reader-bridge-card,
   .journal-head {
     flex-direction: column;
+  }
+
+  .reader-insight-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .reader-actions > * {
+    justify-content: center;
+    width: 100%;
   }
 }

@@ -59,17 +59,30 @@ create table if not exists public.journal_entries (
   unique (user_id, entry_date)
 );
 
+create table if not exists public.learning_progress (
+  user_id uuid not null references auth.users(id) on delete cascade,
+  module_slug text not null,
+  completed_section_slugs text[] not null default '{}',
+  last_section_slug text,
+  last_opened_at timestamptz not null default now(),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  primary key (user_id, module_slug)
+);
+
 create index if not exists habits_user_created_idx on public.habits (user_id, created_at);
 create index if not exists habit_checks_user_date_idx on public.habit_checks (user_id, check_date);
 create index if not exists habit_checks_habit_date_idx on public.habit_checks (habit_id, check_date);
 create index if not exists journal_entries_user_date_idx on public.journal_entries (user_id, entry_date desc);
 create index if not exists journal_entries_phase_idx on public.journal_entries (user_id, cycle_phase);
+create index if not exists learning_progress_user_opened_idx on public.learning_progress (user_id, last_opened_at desc);
 
 alter table public.habits enable row level security;
 alter table public.habit_checks enable row level security;
 alter table public.user_settings enable row level security;
 alter table public.cycle_settings enable row level security;
 alter table public.journal_entries enable row level security;
+alter table public.learning_progress enable row level security;
 
 drop policy if exists "Users can read own habits" on public.habits;
 create policy "Users can read own habits"
@@ -207,5 +220,30 @@ with check (auth.uid() = user_id);
 drop policy if exists "Users can delete own journal entries" on public.journal_entries;
 create policy "Users can delete own journal entries"
 on public.journal_entries for delete
+to authenticated
+using (auth.uid() = user_id);
+
+drop policy if exists "Users can read own learning progress" on public.learning_progress;
+create policy "Users can read own learning progress"
+on public.learning_progress for select
+to authenticated
+using (auth.uid() = user_id);
+
+drop policy if exists "Users can insert own learning progress" on public.learning_progress;
+create policy "Users can insert own learning progress"
+on public.learning_progress for insert
+to authenticated
+with check (auth.uid() = user_id);
+
+drop policy if exists "Users can update own learning progress" on public.learning_progress;
+create policy "Users can update own learning progress"
+on public.learning_progress for update
+to authenticated
+using (auth.uid() = user_id)
+with check (auth.uid() = user_id);
+
+drop policy if exists "Users can delete own learning progress" on public.learning_progress;
+create policy "Users can delete own learning progress"
+on public.learning_progress for delete
 to authenticated
 using (auth.uid() = user_id);
